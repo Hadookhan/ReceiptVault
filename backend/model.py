@@ -49,7 +49,11 @@ def extract_and_categorize(image):
 
         # The API returns a text output; parse as JSON
         text = resp.output_text
-        return json.loads(text)
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            return {"error": "Model returned non-JSON", "raw_text": text}
+
 
     except json.JSONDecodeError:
         print("Model didn't return valid JSON. Raw output:")

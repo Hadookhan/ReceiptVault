@@ -35,7 +35,11 @@ def send_data():
     if not allowed_file(file.filename):
         return jsonify({"error": "File type not allowed"}), 415
 
-    data = extract_and_categorize(file)
+    filename = secure_filename(file.filename)
+    save_path = os.path.join(UPLOAD_DIR, filename)
+    file.save(save_path)
+
+    data = extract_and_categorize(save_path)
     # Will return data that is captured from the image.
     print(data)
 
