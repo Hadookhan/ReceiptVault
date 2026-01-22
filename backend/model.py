@@ -52,11 +52,24 @@ def extract_and_categorize(image):
         )
 
         # The API returns a text output; parse as JSON
-        text = resp.output_text
+        text = resp.output_text.strip()
+
+        # Remove ```json ... ``` or ``` ... ``` wrappers if present
+        if text.startswith("```"):
+            lines = text.splitlines()
+            # drop first line (``` or ```json)
+            if lines and lines[0].startswith("```"):
+                lines = lines[1:]
+            # drop last line (```)
+            if lines and lines[-1].strip() == "```":
+                lines = lines[:-1]
+            text = "\n".join(lines).strip()
+
         try:
             return json.loads(text)
         except json.JSONDecodeError:
-            return {"error": "Model returned non-JSON", "raw_text": text}
+            return {"error": "Model returned non-JSON", "raw_text": resp.output_text}
+
 
 
     except json.JSONDecodeError:
