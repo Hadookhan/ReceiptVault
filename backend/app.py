@@ -50,19 +50,23 @@ def send_data():
     items = data.get("items", [])
     pur_id = data.get("id")
 
+    missing = [k for k,v in {"merchant":store, "total":price, "date":date}.items() if v in (None, "", [])]
+
     if store is None or price is None or date is None:
         return jsonify({"error": "Missing required fields from extraction", "raw": data}), 400
 
 
     return jsonify({
-        "message": "Data received successfully",
-        "id": pur_id,
-        "store": store,
-        "price": price,
-        "date": date,
-        "category": cat,
-        "items": items
-    }), 200
+    "message": "Extraction successful" if not missing else "Partial extraction",
+    "id": pur_id,
+    "missing_fields": missing,
+    "store": store,
+    "price": price,
+    "date": date,
+    "category": cat,
+    "items": items,
+    "raw": data
+}), 200
 
 @app.get("/api/health")
 def health():
