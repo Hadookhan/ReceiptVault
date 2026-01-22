@@ -4,6 +4,7 @@ import base64
 from openai import OpenAI
 from PIL import Image  # optional (only used if you want to verify/open)
 from dotenv import load_dotenv
+import traceback
 
 
 load_dotenv()
@@ -62,6 +63,11 @@ def extract_and_categorize(image):
         print("Model didn't return valid JSON. Raw output:")
         print(resp.output_text if "resp" in locals() else "")
         return None
+
     except Exception as e:
-        print(f"Error: {e}")
-        return None
+        return {
+            "error": "extract_and_categorize_exception",
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
+

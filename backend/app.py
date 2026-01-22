@@ -40,8 +40,20 @@ def send_data():
     file.save(save_path)
 
     data = extract_and_categorize(save_path)
+
+    if data is None:
+        return jsonify({
+            "error": "Extraction failed",
+            "details": "extract_and_categorize returned None. Check /api/debug-last-error or docker logs."
+        }), 502
+
+    if isinstance(data, dict) and data.get("error"):
+        return jsonify({
+            "error": "Extraction failed",
+            "details": data
+    }), 502
+    
     # Will return data that is captured from the image.
-    print(data)
 
     store = data.get("merchant")
     price = data.get("total")
