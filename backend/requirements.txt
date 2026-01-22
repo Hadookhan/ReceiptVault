@@ -1,0 +1,8 @@
+flask
+Flask-SQLAlchemy
+Flask-Migrate
+SQLAlchemy
+werkzeug
+redis
+gunicorn
+openai
