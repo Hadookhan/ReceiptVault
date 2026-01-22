@@ -3,6 +3,7 @@ import json
 import redis
 from werkzeug.utils import secure_filename
 import os
+from model import extract_and_categorize
 
 app = Flask(__name__)
 UPLOAD_DIR = "uploads"
@@ -34,26 +35,29 @@ def send_data():
     if not allowed_file(file.filename):
         return jsonify({"error": "File type not allowed"}), 415
 
+    data = extract_and_categorize(file)
     # Will return data that is captured from the image.
+    print(data)
 
+    store = data.get("merchant")
+    price = data.get("total")
+    date = data.get("date")
+    cat = data.get("department")
+    items = data.get("items", [])
+    pur_id = data.get("id")
 
-    store = ""
-    price = ""
-    date = ""
-    pur_id =  ""
-    cat = ""
+    if store is None or price is None or date is None:
+        return jsonify({"error": "Missing required fields from extraction", "raw": data}), 400
 
-    # Optional validation
-    if not all([store, price, date, pur_id]):
-        return jsonify({"error": "Missing required fields"}), 400
 
     return jsonify({
         "message": "Data received successfully",
+        "id": pur_id,
         "store": store,
         "price": price,
         "date": date,
-        "id": pur_id,
-        "category": cat
+        "category": cat,
+        "items": items
     }), 200
 
 @app.get("/api/health")
