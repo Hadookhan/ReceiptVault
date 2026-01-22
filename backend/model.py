@@ -15,6 +15,9 @@ def extract_and_categorize(image):
     # (Optional) sanity check that Pillow can open it
     Image.open(image).convert("RGB")
 
+    ext = os.path.splitext(image)[1].lower()
+    mime = "image/png" if ext == ".png" else "image/jpeg"
+
     # Read and base64-encode image for OpenAI
     with open(image, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("utf-8")
@@ -40,7 +43,7 @@ def extract_and_categorize(image):
                         {"type": "input_text", "text": prompt},
                         {
                             "type": "input_image",
-                            "image_url": f"data:image/jpeg;base64,{b64}",
+                            "image_url": f"data:{mime};base64,{b64}",
                         },
                     ],
                 }
